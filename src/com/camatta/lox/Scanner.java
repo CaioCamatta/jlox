@@ -20,7 +20,7 @@ public class Scanner {
 
     List<Token> scanTokens() {
         while (!isAtEnd()) {
-            // we are at teh beginning of the next lexeme
+            // we are at the beginning of the next lexeme
             start = current;
             scanToken();
         }
@@ -74,10 +74,65 @@ public class Scanner {
             case '>':
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;
+            case '/':
+                if (match('/')) {
+                    // A comments goes until end of line
+                    while (peek() != '\n' && !isAtEnd())
+                        advance();
+                } else {
+                    addToken(SLASH);
+                }
+            case ' ':
+            case '\r':
+            case '\t':
+                break;
+            case '\n':
+                line++;
+                break;
+            case '"':
+                string();
+                break;
             default:
-                Lox.error(line, "Unexpected character.");
+                if (isDigit(c)) {
+                    number();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                }
                 break;
         }
+    }
+
+    private void number() {
+        while (isDigit(peek()))
+            advance();
+
+        // Look for fraction
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance(); // consume "."
+
+            while (isDigit(peek()))
+                advance();
+        }
+
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
+    private void string() {
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n')
+                line++;
+            advance();
+        }
+
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        }
+
+        advance(); // closing ".
+
+        String value = source.substring(start + 1, current - 1); // trim the actual "s
+        addToken(STRING, value);
     }
 
     private boolean match(char expected) {
@@ -89,6 +144,24 @@ public class Scanner {
         // Only consume character if it is what we're looking for
         current++;
         return true;
+    }
+
+    // Look at current unconsumed character
+    private char peek() {
+        if (isAtEnd())
+            return '\0';
+        return source.charAt(current);
+    }
+
+    // Second character of lookahead
+    private char peekNext() {
+        if (current + 1 >= source.length())
+            return '\0';
+        return source.charAt(current + 1);
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
     private boolean isAtEnd() {
@@ -103,6 +176,7 @@ public class Scanner {
         addToken(type, null);
     }
 
+    // Tokens with literals, like (STRING, "turkey")
     private void addToken(TokenType type, Object literal) {
         String text = source.substring(start, current);
         tokens.add(new Token(type, text, literal, line));
