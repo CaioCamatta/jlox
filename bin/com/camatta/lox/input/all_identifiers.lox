@@ -1,0 +1,46 @@
+// Single char tokens
+(
+)
+{
+}
+,
+.
+-
++
+;
+/
+*
+
+// One or two chars
+!
+!=
+=
+==
+>
+>=
+<
+<=
+
+// literals
+a
+"asdas"
+23
+
+// keywords
+and
+class
+else
+false
+fun
+for
+if
+nil
+or
+print
+return
+super
+this
+true
+var
+while
+// EOF
