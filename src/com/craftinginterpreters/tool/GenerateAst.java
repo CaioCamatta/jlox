@@ -20,6 +20,7 @@ public class GenerateAst {
 
         // Expressions (e.g. 2 + 3)
         defineAst(outputDir, "Expr", Arrays.asList(
+                "Ternary    : Expr condition, Expr exprIfTrue, Expr exprIfFalse",
                 "Binary     : Expr left, Token operator, Expr right",
                 "Call       : Expr callee, Token paren, List<Expr> arguments",
                 "Assign     : Token name, Expr value",
