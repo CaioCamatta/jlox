@@ -50,9 +50,9 @@ public class GenerateAst {
 
         // base accept() method
         writer.println();
-        writer.println("    abstract <R> R accept(Visitor<R> visitor);");
+        writer.println("  abstract <R> R accept(Visitor<R> visitor);");
 
-        writer.println("}\n");
+        writer.println("}");
         writer.close();
     }
 
@@ -105,6 +105,6 @@ public class GenerateAst {
                     "        R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
         }
 
-        writer.println("    }\n");
+        writer.println("  }");
     }
 }
