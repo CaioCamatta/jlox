@@ -4,6 +4,8 @@ import java.util.List;
 
 abstract class Expr {
     interface Visitor<R> {
+        R visitTernaryExpr(Ternary expr);
+
         R visitBinaryExpr(Binary expr);
 
         R visitGroupingExpr(Grouping expr);
@@ -11,6 +13,23 @@ abstract class Expr {
         R visitLiteralExpr(Literal expr);
 
         R visitUnaryExpr(Unary expr);
+    }
+
+    static class Ternary extends Expr {
+        Ternary(Expr condition, Expr exprIfTrue, Expr exprIfFalse) {
+            this.condition = condition;
+            this.exprIfTrue = exprIfTrue;
+            this.exprIfFalse = exprIfFalse;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitTernaryExpr(this);
+        }
+
+        final Expr condition;
+        final Expr exprIfTrue;
+        final Expr exprIfFalse;
     }
 
     static class Binary extends Expr {

@@ -24,7 +24,22 @@ class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return ternary();
+
+    }
+
+    /* Rule : ternary -> equality | equality "?" ternary ":" ternary */
+    private Expr ternary() {
+        Expr expr = equality();
+
+        if (match(QUESTION)) {
+            Expr exprIfTrue = ternary();
+            consume(COLON, "Expected ':' to complete ternary operator.");
+            Expr exprIfFalse = ternary();
+            expr = new Expr.Ternary(expr, exprIfTrue, exprIfFalse);
+        }
+
+        return expr;
     }
 
     // If equality were left recursive, the recursive descent parser
