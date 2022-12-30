@@ -40,7 +40,7 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
 
         for (;;) {
-            System.out.println("> ");
+            System.out.print("> ");
             String line = reader.readLine();
             // If user presses CTRL D (end of file), exit loop
             if (line == null)
