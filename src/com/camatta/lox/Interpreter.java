@@ -104,7 +104,15 @@ class Interpreter implements Expr.Visitor<Object> {
                     return (String) left + (String) right;
                 }
 
-                // We already have type checks, so we throw if neither of the cases match
+                // If either operand is a string, convert the other to a string
+                if (left instanceof String && right instanceof Double) {
+                    return (String) left + doubleAsString((Double) right);
+                }
+                if (left instanceof Double && right instanceof String) {
+                    return doubleAsString((Double) left) + (String) right;
+                }
+
+                // We already have type checks, so we throw if none of the cases match
                 throw new RuntimeError(expr.operator,
                         "Operands must be two numbers or two strings.");
             case SLASH:
@@ -139,13 +147,21 @@ class Interpreter implements Expr.Visitor<Object> {
             return "nil";
 
         if (object instanceof Double) {
-            String text = object.toString();
-            if (text.endsWith(".0")) {
-                text = text.substring(0, text.length() - 2);
-            }
-            return text;
+            return doubleAsString((Double) object);
         }
 
         return object.toString();
+    }
+
+    /*
+     * Converts a double to a string and removes trailing '.0' if it's a whole
+     * number (an int)
+     */
+    private String doubleAsString(Double number) {
+        String text = number.toString();
+        if (text.endsWith(".0")) {
+            text = text.substring(0, text.length() - 2);
+        }
+        return text;
     }
 }
