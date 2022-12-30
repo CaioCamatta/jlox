@@ -13,7 +13,7 @@ public class TestScanner {
 
     @Test
     public void testAllIdentifiers() throws IOException{
-        String actual = Lox.runToString("/home/caio/Documents/JLox/jlox/test/com/camatta/lox/input/all_identifiers.lox");
+        String actual = Lox.runToString("/home/caio/Documents/JLox/jlox/test/com/camatta/lox/input/all_identifiers.txt");
 
         byte[] bytes = Files.readAllBytes(Paths.get("/home/caio/Documents/JLox/jlox/test/com/camatta/lox/output/all_identifiers.txt"));
         String expected = new String(bytes, Charset.defaultCharset()); 

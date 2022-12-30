@@ -1,12 +1,16 @@
 package com.camatta.lox;
 
+import java.util.List;
+
 /**
  * Prints a tree in as a Lisp-style string.
  * This class isn't strictly necessary, just a nice-to-have.
  */
-class AstPrinter implements Expr.Visitor<String> {
-    String print(Expr expr) {
-        return expr.accept(this);
+class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
+    void print(List<Stmt> statements) {
+        for (Stmt s : statements) {
+            System.out.println("[parser] statement: " + s.accept(this));
+        }
     }
 
     @Override
@@ -29,6 +33,16 @@ class AstPrinter implements Expr.Visitor<String> {
     @Override
     public String visitUnaryExpr(Expr.Unary expr) {
         return parenthesize(expr.operator.lexeme, expr.right);
+    }
+
+    @Override
+    public String visitExpressionStmt(Stmt.Expression expr) {
+        return parenthesize("expr", expr.expression);
+    }
+
+    @Override
+    public String visitPrintStmt(Stmt.Print expr) {
+        return parenthesize("print", expr.expression);
     }
 
     private String parenthesize(String name, Expr... exprs) {

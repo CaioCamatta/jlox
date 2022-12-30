@@ -12,12 +12,16 @@ public class Lox {
     private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
+    static boolean verbose = false; // Whether to print debugging info
 
     public static void main(String[] args) throws IOException {
-        if (args.length > 1) {
-            System.out.println("Usage: jlox [script]");
+        if (args.length > 2) {
+            System.out.println("Usage: jlox [-v]? [script]");
             System.exit(64);
-        } else if (args.length == 1) {
+        } else if (args.length == 2 && args[0].contains("-v")) {
+            verbose = true;
+            runFile(args[1]);
+        } else if (args.length == 1 && !args[0].contains("-v")) {
             runFile(args[0]);
         } else {
             runPrompt();
@@ -40,7 +44,7 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
 
         for (;;) {
-            System.out.print("> ");
+            System.out.println("> ");
             String line = reader.readLine();
             // If user presses CTRL D (end of file), exit loop
             if (line == null)
@@ -56,8 +60,10 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        for (Token token : tokens) {
-            System.out.println("[scanner] token: " + token);
+        if (verbose) {
+            for (Token token : tokens) {
+                System.out.println("[scanner] token: " + token);
+            }
         }
 
         Parser parser = new Parser(tokens);
@@ -67,7 +73,9 @@ public class Lox {
         if (hadError)
             return;
 
-        // System.out.println("[parser] expression: " + new AstPrinter().print(expression));
+        if (verbose)
+            new AstPrinter().print(statements);
+
         interpreter.interpret(statements);
     }
 
