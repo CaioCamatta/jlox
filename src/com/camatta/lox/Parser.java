@@ -1,5 +1,6 @@
 package com.camatta.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.camatta.lox.TokenType.*;
@@ -15,16 +16,38 @@ class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try {
-            return expression();
-        } catch (ParseError error) {
-            return null;
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        // Parse statements until EOF. This is the program rule
+        // program -> statement* EOF ;
+        while (!isAtEnd()) {
+            statements.add(statement());
         }
+
+        return statements;
     }
 
     private Expr expression() {
         return equality();
+    }
+
+    private Stmt statement() {
+        if (match(PRINT))
+            return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expected ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
     }
 
     // If equality were left recursive, the recursive descent parser

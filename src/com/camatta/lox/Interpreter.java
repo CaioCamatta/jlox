@@ -1,10 +1,13 @@
 package com.camatta.lox;
 
-class Interpreter implements Expr.Visitor<Object> {
-    void interpret(Expr expression) {
+import java.util.List;
+
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
@@ -65,6 +68,11 @@ class Interpreter implements Expr.Visitor<Object> {
     /* Send the expression back into the interpreter's visitor implementation. */
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    /* Analogue to evaluate(). */
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
     }
 
     @Override
@@ -169,5 +177,18 @@ class Interpreter implements Expr.Visitor<Object> {
             text = text.substring(0, text.length() - 2);
         }
         return text;
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
     }
 }

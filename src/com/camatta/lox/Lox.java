@@ -61,14 +61,14 @@ public class Lox {
         }
 
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // Stop if there was a syntax error
         if (hadError)
             return;
 
-        System.out.println("[parser] expression: " + new AstPrinter().print(expression));
-        interpreter.interpret(expression);
+        // System.out.println("[parser] expression: " + new AstPrinter().print(expression));
+        interpreter.interpret(statements);
     }
 
     protected static String runToString(String path) throws IOException {
