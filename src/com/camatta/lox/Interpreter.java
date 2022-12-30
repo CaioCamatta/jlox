@@ -117,6 +117,12 @@ class Interpreter implements Expr.Visitor<Object> {
                         "Operands must be two numbers or two strings.");
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
+
+                // Check if the denominator is zero and raise an error if so
+                if ((Double) right == 0)
+                    throw new RuntimeError(expr.operator,
+                            "Division by zero is undefined.");
+
                 return (double) left / (double) right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
