@@ -21,16 +21,19 @@ public class GenerateAst {
         // Expressions (e.g. 2 + 3)
         defineAst(outputDir, "Expr", Arrays.asList(
                 "Binary     : Expr left, Token operator, Expr right",
+                "Assign     : Token name, Expr value",
                 "Grouping   : Expr expression",
                 "Literal    : Object value",
-                "Unary      : Token operator, Expr right"));
+                "Unary      : Token operator, Expr right",
+                "Variable   : Token name"));
 
         // Statements (e.g. if)
         // Statements have their own base class because statement and expression
         // syntaxes are disjoint.
         defineAst(outputDir, "Stmt", Arrays.asList(
                 "Expression : Expr expression",
-                "Print      : Expr expression"));
+                "Print      : Expr expression",
+                "Var        : Token name, Expr initializer")); // Optional initializer, e.g. var a = 0
     }
 
     private static void defineAst(

@@ -24,6 +24,7 @@ public class Lox {
         } else if (args.length == 1 && !args[0].contains("-v")) {
             runFile(args[0]);
         } else {
+            verbose = args[0].contains("-v");
             runPrompt();
         }
     }

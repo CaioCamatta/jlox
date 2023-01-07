@@ -19,16 +19,30 @@ class Parser {
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         // Parse statements until EOF. This is the program rule
-        // program -> statement* EOF ;
+        // program -> declaration* EOF ;
         while (!isAtEnd()) {
-            statements.add(statement());
+            statements.add(declaration());
         }
 
         return statements;
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    private Stmt declaration() {
+        try {
+            if (match(VAR))
+                return varDeclaration();
+
+            return statement();
+        } catch (ParseError error) {
+            // This method is repeatedly called when parsing a series of statements, so it's
+            // a good place to synchronize when the parser goes into panic mode
+            synchronize();
+            return null;
+        }
     }
 
     private Stmt statement() {
@@ -44,10 +58,51 @@ class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt varDeclaration() {
+        // At this point, the parser has already parsed VAR, so next we should have an
+        // identifier with the variable name
+        Token name = consume(IDENTIFIER, "Expected variable name.");
+
+        // Initializers are optional. If nothing is provided we initialize with null.
+        // Otherwise, we expect an expression
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expected ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }
+
     private Stmt expressionStatement() {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    private Expr assignment() {
+        // Parse some expression on the left
+        Expr expr = equality();
+
+        // If we find an equals,
+        if (match(EQUAL)) {
+            Token equals = previous();
+
+            // Assignment is right-associative, so recursively call assignment() to parse
+            // the right-hand side
+            Expr value = assignment();
+            
+            // look at the left-hand sign to figure out what kind of assignment target it is.
+            if (expr instanceof Expr.Variable) {
+                // Convert the r-value expression node into an l-value representation
+                Token name = ((Expr.Variable) expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
     // If equality were left recursive, the recursive descent parser
@@ -127,6 +182,11 @@ class Parser {
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        // This allows using a variable!
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
 
         if (match(LEFT_PAREN)) {

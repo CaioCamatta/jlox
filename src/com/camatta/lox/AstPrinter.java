@@ -42,7 +42,22 @@ class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
     @Override
     public String visitPrintStmt(Stmt.Print expr) {
-        return parenthesize("print", expr.expression);
+        return parenthesize("print");
+    }
+
+    @Override
+    public String visitVarStmt(Stmt.Var stmt) {
+        return parenthesize("var " + stmt.name.lexeme, stmt.initializer);
+    }
+
+    @Override
+    public String visitVariableExpr(Expr.Variable expr) {
+        return parenthesize("var", expr);
+    }
+
+    @Override
+    public String visitAssignExpr(Expr.Assign expr) {
+        return parenthesize("assign " + expr.name.lexeme, expr.value);
     }
 
     private String parenthesize(String name, Expr... exprs) {
@@ -50,9 +65,12 @@ class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
         builder.append("(").append(name);
         for (Expr expr : exprs) {
-            builder.append(" ");
-            // Recurse
-            builder.append(expr.accept(this));
+            if (expr != null) {
+                builder.append(" ");
+                // Recurse
+                builder.append(expr.accept(this));
+
+            }
         }
         builder.append(")");
 
