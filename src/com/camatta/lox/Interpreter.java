@@ -2,6 +2,8 @@ package com.camatta.lox;
 
 import java.util.List;
 
+import javax.lang.model.element.ExecutableElement;
+
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     // Variables will stay in memory as long as the interpreer is running.
     private Environment environment = new Environment();
@@ -76,6 +78,31 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     /* Analogue to evaluate(). */
     private void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    /* Execute statements in the context of a given environment by */
+    void executeBlock(List<Stmt> statements, Environment environment) {
+        // There are cleaner ways to do this than to change and restore the enviroment
+        Environment previous = this.environment;
+
+        try {
+            // Update the environment
+            this.environment = environment;
+
+            // Visit all statements
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            // Restore previous environment
+            this.environment = previous;
+        }
     }
 
     @Override

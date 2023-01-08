@@ -31,6 +31,7 @@ public class GenerateAst {
         // Statements have their own base class because statement and expression
         // syntaxes are disjoint.
         defineAst(outputDir, "Stmt", Arrays.asList(
+                "Block      : List<Stmt> statements",
                 "Expression : Expr expression",
                 "Print      : Expr expression",
                 "Var        : Token name, Expr initializer")); // Optional initializer, e.g. var a = 0
