@@ -13,6 +13,9 @@ public class Lox {
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
     static boolean verbose = false; // Whether to print debugging info
+    // For convenience, in the REPL we want to allow the user to enter an expression
+    // and see its result.
+    protected static boolean replMode = false;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 2) {
@@ -40,7 +43,13 @@ public class Lox {
             System.exit(70);
     }
 
+    /* REPL */
     public static void runPrompt() throws IOException {
+        // Interpreter will behave slightly differently in the REPL.
+        // For example, in the REPL we allow the user to enter an expression and see its
+        // result.
+        replMode = true;
+
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
