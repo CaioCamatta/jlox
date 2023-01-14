@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.lang.model.element.ExecutableElement;
 
+import com.camatta.lox.Stmt.If;
+
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     // Variables will stay in memory as long as the interpreer is running.
     private Environment environment = new Environment();
@@ -21,6 +23,23 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Expr.Logical expr) {
+        Object left = evaluate(expr.left);
+
+        // See if we can short-circuit
+        if (expr.operator.type == TokenType.OR) {
+            if (isTruthy(left))
+                return left;
+        } else {
+            if (!isTruthy(left))
+                return left;
+        }
+
+        // If we can't short-circuit, only then evaluate the right operand.
+        return evaluate(expr.right);
     }
 
     @Override
@@ -216,6 +235,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        // Only evaluate subtrees if the condition is true
+        // (This differs from how the Interpreter handles other syntax)
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
+        return null;
+    }
+
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
@@ -232,6 +263,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Void visitWhileStmt(Stmt.While stmt) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body);
+        }
         return null;
     }
 
