@@ -2,4 +2,4 @@
 
 make build --no-print-directory
 
-java -cp build/src com.camatta.lox.Lox $1
+java -cp build/src com.camatta.lox.Lox $1 $2
