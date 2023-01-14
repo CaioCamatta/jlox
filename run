@@ -1,0 +1,5 @@
+#!/bin/sh
+
+make build --no-print-directory
+
+java -cp build/src com.camatta.lox.Lox $1
