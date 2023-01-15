@@ -1,5 +1,6 @@
 package com.camatta.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.ExecutableElement;
@@ -8,7 +9,29 @@ import com.camatta.lox.Stmt.If;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     // Variables will stay in memory as long as the interpreer is running.
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    // The environment changes as we enter/exit local scopes
+    private Environment environment = globals;
+
+    Interpreter() {
+        // Define a native function
+        globals.define("clock", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return (double) System.currentTimeMillis() / 1000.0;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+    }
 
     void interpret(List<Stmt> statements) {
         try {
@@ -191,6 +214,30 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        // Typically, the callee is just an identifier that looks up the function by
+        // name, e.g. "evaluate", but it could be any expression.
+        Object callee = evaluate(expr.callee);
+
+        List<Object> arguments = new ArrayList<>();
+        for (Expr argument : expr.arguments) {
+            arguments.add(evaluate(argument));
+        }
+
+        if (!(callee instanceof LoxCallable)) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+
+        LoxCallable function = (LoxCallable) callee;
+        if (arguments.size() != function.arity()) {
+            throw new RuntimeError(expr.paren,
+                    "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
+        }
+
+        return function.call(this, arguments);
+    }
+
     /*
      * Lox's equality is the same as Java: no implicit conversions; null == null.
      */
@@ -235,6 +282,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitFunctionStmt(Stmt.Function stmt) {
+        // Take a compile-time representation of the function and confert it to its
+        // runtime representation
+        // Here, we pass the environment that is active when the function is *declared*,
+        // not when its called (closure). It represents the lexical scope surrounding
+        // the function.
+        LoxFunction function = new LoxFunction(stmt, environment);
+        environment.define(stmt.name.lexeme, function);
+        return null;
+    }
+
+    @Override
     public Void visitIfStmt(Stmt.If stmt) {
         // Only evaluate subtrees if the condition is true
         // (This differs from how the Interpreter handles other syntax)
@@ -251,6 +310,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt) {
+        Object value = null;
+        if (stmt.value != null)
+            value = evaluate(stmt.value);
+
+        throw new Return(value);
     }
 
     @Override
