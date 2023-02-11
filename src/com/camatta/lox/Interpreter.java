@@ -1,7 +1,9 @@
 package com.camatta.lox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.ExecutableElement;
 
@@ -12,6 +14,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     final Environment globals = new Environment();
     // The environment changes as we enter/exit local scopes
     private Environment environment = globals;
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter() {
         // Define a native function
@@ -120,6 +123,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     /* Analogue to evaluate(). */
     private void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    /*
+     * Resolve a variable
+     * - Every time the resolver visits a variable, it tells the interpreter how
+     * many scopes there are between the current scope and the scope where the var
+     * is defined. At runtime, the number of scopes = the number pf environments.
+     */
+    void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
     }
 
     @Override
@@ -345,12 +358,32 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
+
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, value);
+        } else {
+            globals.assign(expr.name, value);
+        }
+
         environment.assign(expr.name, value);
         return value;
     }
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return environment.get(expr.name);
+        return lookUpVariable(expr.name, expr);
+    }
+
+    private Object lookUpVariable(Token name, Expr expr) {
+        // Look up the resolved distance in the map
+        // We only resolve local variables
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            // If we do get a distance, we get the correct variable
+            return environment.getAt(distance, name.lexeme);
+        } else {
+            return globals.get(name);
+        }
     }
 }
