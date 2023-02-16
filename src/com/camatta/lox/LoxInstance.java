@@ -25,7 +25,7 @@ class LoxInstance {
         // If we don't find a field, look for a method in the class
         LoxFunction method = loxClass.findMethod(name.lexeme);
         if (method != null)
-            return method;
+            return method.bind(this);
 
         // Unlike javascript (which silently returns undefined), we throw an error if a
         // property isnt defined

@@ -29,12 +29,23 @@ class LoxClass implements LoxCallable {
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
         LoxInstance instance = new LoxInstance(this);
+
+        // When a class is called, after the instance is created, look for an init. If
+        // we find it, bind and invoke it just like a normal method.
+        LoxFunction initializer = findMethod("init");
+        if (initializer != null) {
+            initializer.bind(instance).call(interpreter, arguments);
+        }
+
         return instance;
     }
 
+    /* Number of arguments */
     @Override
     public int arity() {
-        // Num of arguments
-        return 0;
+        LoxFunction initializer = findMethod("init");
+        if (initializer == null)
+            return 0;
+        return initializer.arity();
     }
 }
