@@ -146,4 +146,10 @@ class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public String visitSuperExpr(Super expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
