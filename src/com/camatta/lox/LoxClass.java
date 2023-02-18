@@ -1,18 +1,58 @@
 package com.camatta.lox;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class LoxClass implements LoxCallable {
+class LoxClass extends LoxInstance implements LoxCallable {
     final String name;
     final LoxClass superclass;
     private final Map<String, LoxFunction> methods;
+    private final Map<String, LoxFunction> staticMethods;
+    private final Map<String, Object> fields = new HashMap<>();
 
-    LoxClass(String name, LoxClass superclass, Map<String, LoxFunction> methods) {
+    LoxClass(String name, LoxClass superclass, Map<String, LoxFunction> methods,
+            Map<String, LoxFunction> staticMethods) {
         this.superclass = superclass;
         this.name = name;
-        // Methods are owner by the class. Instances own fields
+        // Instance methods are owner by the class. Instances own fields
         this.methods = methods;
+        this.staticMethods = staticMethods;
+    }
+
+    /* Get a property (class field or method) */
+    @Override
+    Object get(Token name) {
+        if (fields.containsKey(name.lexeme)) {
+            return fields.get(name.lexeme);
+        }
+
+        // If we don't find a field, look for a method in the class
+        LoxFunction method = findStaticMethod(name.lexeme);
+        if (method != null)
+            return method;
+
+        // Unlike javascript (which silently returns undefined), we throw an error if a
+        // property isnt defined
+        throw new RuntimeError(name,
+                "Undefined static property '" + name.lexeme + "'.");
+    }
+
+    @Override
+    void set(Token name, Object value) {
+        fields.put(name.lexeme, value);
+    }
+
+    LoxFunction findStaticMethod(String name) {
+        if (staticMethods.containsKey(name)) {
+            return staticMethods.get(name);
+        }
+
+        if (superclass != null) {
+            return superclass.findStaticMethod(name);
+        }
+
+        return null;
     }
 
     LoxFunction findMethod(String name) {

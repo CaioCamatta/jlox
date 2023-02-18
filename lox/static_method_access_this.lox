@@ -1,0 +1,11 @@
+class Doughnut {
+    init(){
+        this.type = "Boston Cream";    
+    }
+    
+    static cook() {
+        print this.type;
+    }
+}
+
+Doughnut().cook();

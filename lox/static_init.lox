@@ -1,0 +1,7 @@
+class Person {
+    static init(){
+        this.name = "Fyodor";    
+    }
+}
+
+Person();
