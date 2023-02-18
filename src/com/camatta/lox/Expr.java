@@ -5,16 +5,27 @@ import java.util.List;
 abstract class Expr {
     interface Visitor<R> {
         R visitBinaryExpr(Binary expr);
+
         R visitCallExpr(Call expr);
+
         R visitAssignExpr(Assign expr);
+
         R visitGetExpr(Get expr);
+
         R visitGroupingExpr(Grouping expr);
+
         R visitLiteralExpr(Literal expr);
+
         R visitLogicalExpr(Logical expr);
+
         R visitSetExpr(Set expr);
+
         R visitSuperExpr(Super expr);
+
         R visitThisExpr(This expr);
+
         R visitUnaryExpr(Unary expr);
+
         R visitVariableExpr(Variable expr);
     }
 
@@ -198,7 +209,5 @@ abstract class Expr {
         final Token name;
     }
 
-
     abstract <R> R accept(Visitor<R> visitor);
 }
-
