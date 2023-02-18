@@ -4,8 +4,8 @@ class Doughnut {
     }
     
     static cook() {
-        print "Cooking";
+        print this.type;
     }
 }
 
-Doughnut.cook();
+Doughnut().cook();
