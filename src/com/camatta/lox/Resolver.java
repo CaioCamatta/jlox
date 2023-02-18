@@ -19,7 +19,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         NONE,
         FUNCTION,
         INITIALIZER,
-        METHOD
+        METHOD,
+        STATIC_METHOD
     }
 
     private enum ClassType {
@@ -63,6 +64,15 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         beginScope();
+
+        for (Stmt.Function staticMethod : stmt.staticMethods) {
+            FunctionType declaration = FunctionType.STATIC_METHOD;
+            if (staticMethod.name.lexeme.equals("init")) {
+                Lox.error(staticMethod.name, "The object initializer 'init()' can't be static.");
+            }
+            resolveFunction(staticMethod, declaration);
+        }
+
         scopes.peek().put("this", true);
         // Whenever "this" is encoutered inside a method, it will resole to a local
         // variable defined in an implicit scope outside the block for the method body.

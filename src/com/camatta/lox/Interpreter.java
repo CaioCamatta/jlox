@@ -74,7 +74,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         if (!(object instanceof LoxInstance)) {
             throw new RuntimeError(expr.name,
-                    "Only instances have fields.");
+                    "Only instances and classes have fields.");
         }
 
         Object value = evaluate(expr.value);
@@ -229,9 +229,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             methods.put(method.name.lexeme, function);
         }
 
+        Map<String, LoxFunction> staticMethods = new HashMap<>();
+        for (Stmt.Function staticMethod : stmt.staticMethods) {
+            LoxFunction function = new LoxFunction(staticMethod, environment, staticMethod.name.lexeme.equals("init"));
+            staticMethods.put(staticMethod.name.lexeme, function);
+        }
+
         // Turn the syntactic representation of the class (AST node) into its runtime
         // representation
-        LoxClass loxClass = new LoxClass(stmt.name.lexeme, (LoxClass) superclass, methods);
+        LoxClass loxClass = new LoxClass(stmt.name.lexeme, (LoxClass) superclass, methods, staticMethods);
 
         if (superclass != null) {
             environment = environment.enclosing;
@@ -341,7 +347,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             return ((LoxInstance) object).get(expr.name);
         }
 
-        // Nothing other than a class has properties.
+        // Nothing other than instances and classes have properties.
         throw new RuntimeError(expr.name, "Only instances have properties.");
     }
 

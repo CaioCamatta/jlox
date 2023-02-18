@@ -1,0 +1,11 @@
+class Doughnut {
+    init(){
+        this.name = "Fyodor";    
+    }
+    
+    static cook() {
+        print this.name;
+    }
+}
+
+Doughnut().cook();

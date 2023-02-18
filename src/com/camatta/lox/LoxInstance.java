@@ -11,6 +11,9 @@ class LoxInstance {
         this.loxClass = loxClass;
     }
 
+    LoxInstance() {
+    }
+
     @Override
     public String toString() {
         return loxClass.name + " instance";
@@ -26,6 +29,12 @@ class LoxInstance {
         LoxFunction method = loxClass.findMethod(name.lexeme);
         if (method != null)
             return method.bind(this);
+
+
+        // Check if user accidentaly tried to access a static method in an instance
+        if (loxClass.findStaticMethod(name.lexeme) != null)
+        throw new RuntimeError(name,
+                "Can't access static method '" + name.lexeme + "' in an instance.");
 
         // Unlike javascript (which silently returns undefined), we throw an error if a
         // property isnt defined
