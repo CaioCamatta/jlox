@@ -1,4 +1,4 @@
-package com.camatta.tool;
+package com.craftinginterpreters.tool;
 // This is a tool that we are using to generate syntax tree classes. So, it isn't part of the interpreter itself
 
 import java.io.IOException;

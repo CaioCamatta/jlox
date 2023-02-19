@@ -1,4 +1,4 @@
-package com.camatta.lox;
+package com.craftinginterpreters.lox;
 
 import java.io.BufferedReader;
 import java.io.IOException;

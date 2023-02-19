@@ -1,10 +1,10 @@
-package com.camatta.lox;
+package com.craftinginterpreters.lox;
+
+import static com.craftinginterpreters.lox.TokenType.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.camatta.lox.TokenType.*;
 
 class Parser {
     private static class ParseError extends RuntimeException {

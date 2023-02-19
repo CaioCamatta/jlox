@@ -1,4 +1,4 @@
-package com.camatta.lox;
+package com.craftinginterpreters.lox;
 
 import java.util.List;
 import java.util.Map;

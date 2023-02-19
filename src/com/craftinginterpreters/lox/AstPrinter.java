@@ -1,10 +1,10 @@
-package com.camatta.lox;
+package com.craftinginterpreters.lox;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.camatta.lox.Expr.*;
-import com.camatta.lox.Stmt.*;
+import com.craftinginterpreters.lox.Expr.*;
+import com.craftinginterpreters.lox.Stmt.*;
 
 /**
  * Prints a tree in as a Lisp-style string.

@@ -1,4 +1,4 @@
-package com.camatta.lox;
+package com.craftinginterpreters.lox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.lang.model.element.ExecutableElement;
 
-import com.camatta.lox.Stmt.If;
+import com.craftinginterpreters.lox.Stmt.If;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     // Variables will stay in memory as long as the interpreer is running.
