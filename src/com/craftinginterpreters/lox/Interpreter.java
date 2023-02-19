@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.lang.model.element.ExecutableElement;
-
-import com.craftinginterpreters.lox.Stmt.If;
-
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     // Variables will stay in memory as long as the interpreer is running.
     final Environment globals = new Environment();
@@ -127,6 +123,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 // what makes this language dynamically typed.
                 checkNumberOperand(expr.operator, right);
                 return -(double) right;
+            default:
+                break;
         }
 
         // Shouldn't be reached
@@ -303,6 +301,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
                 return (double) left * (double) right;
+            default:
+                break;
 
         }
 

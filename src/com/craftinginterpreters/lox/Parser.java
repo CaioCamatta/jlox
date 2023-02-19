@@ -507,7 +507,7 @@ class Parser {
             if (previous().type == SEMICOLON)
                 return;
 
-            // Other keywordalso denote start of another statement
+            // Other keyword also denotes the start of another statement
             switch (peek().type) {
                 case CLASS:
                 case FUN:
@@ -518,6 +518,8 @@ class Parser {
                 case PRINT:
                 case RETURN:
                     return;
+                default:
+                    break;
             }
 
             advance();
