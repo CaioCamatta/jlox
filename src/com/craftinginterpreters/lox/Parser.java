@@ -29,7 +29,21 @@ class Parser {
     }
 
     private Expr expression() {
-        return assignment();
+        return ternary();
+    }
+
+    // Rule : ternary -> assignment | assignment "?" ternary ":" ternary
+    private Expr ternary() {
+        Expr expr = assignment();
+
+        if (match(QUESTION)) {
+            Expr exprIfTrue = ternary();
+            consume(COLON, "Expected ':' to complete ternary operator.");
+            Expr exprIfFalse = ternary();
+            expr = new Expr.Ternary(expr, exprIfTrue, exprIfFalse);
+        }
+
+        return expr;
     }
 
     private Stmt declaration() {

@@ -20,6 +20,7 @@ public class GenerateAst {
 
         // Expressions (e.g. 2 + 3)
         defineAst(outputDir, "Expr", Arrays.asList(
+                "Ternary    : Expr condition, Expr exprIfTrue, Expr exprIfFalse",
                 "Binary     : Expr left, Token operator, Expr right",
                 "Call       : Expr callee, Token paren, List<Expr> arguments",
                 "Assign     : Token name, Expr value",
@@ -56,7 +57,7 @@ public class GenerateAst {
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
 
-        writer.println("package com.camatta.lox;");
+        writer.println("package com.craftinginterpreters.lox;");
         writer.println();
         writer.println("import java.util.List;");
         writer.println();
@@ -73,9 +74,9 @@ public class GenerateAst {
 
         // base accept() method
         writer.println();
-        writer.println("    abstract <R> R accept(Visitor<R> visitor);");
+        writer.println("  abstract <R> R accept(Visitor<R> visitor);");
 
-        writer.println("}\n");
+        writer.println("}");
         writer.close();
     }
 
@@ -128,6 +129,6 @@ public class GenerateAst {
                     "        R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
         }
 
-        writer.println("    }\n");
+        writer.println("  }");
     }
 }
