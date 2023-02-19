@@ -57,7 +57,7 @@ public class GenerateAst {
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
 
-        writer.println("package com.camatta.lox;");
+        writer.println("package com.craftinginterpreters.lox;");
         writer.println();
         writer.println("import java.util.List;");
         writer.println();
